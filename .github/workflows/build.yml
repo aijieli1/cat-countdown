@@ -1,0 +1,25 @@
+name: Windows build
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - name: Widget checks
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python test_widget.py
+      - run: python -m PyInstaller --noconfirm CountdownWidget.spec
+      - name: Compile installer
+        shell: pwsh
+        run: '& "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" installer.iss'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CatCountdown-Windows-x64
+          path: installer-output/*.exe
