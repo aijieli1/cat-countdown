@@ -54,6 +54,19 @@ def check():
         assert [c.task["date"] for c in cards] == sorted(t["date"] for t in data["tasks"])
         assert "…" in cards[-1].title.text()
         assert cards[-1].task["title"] in cards[-1].toolTip()
+        # 五星可直接改、清除，保存失败不变；日期排序不受星级影响。
+        original_dates = [c.task['date'] for c in cards]
+        QTest.mouseClick(cards[1].stars.buttons[4], Qt.LeftButton)
+        assert cards[1].stars.value == 5 and cards[1].task['importance'] == 5
+        assert widget.load_data()['tasks'] == data['tasks']
+        QTest.mouseClick(cards[1].stars.buttons[1], Qt.LeftButton)
+        assert cards[1].stars.value == 2
+        with patch.object(widget, 'save_data', return_value=False):
+            QTest.mouseClick(cards[1].stars.buttons[3], Qt.LeftButton)
+        assert cards[1].stars.value == 2 and cards[1].task['importance'] == 2
+        assert [c.task['date'] for c in cards] == original_dates
+        QTest.mouseClick(cards[1].stars.buttons[1], Qt.LeftButton)
+        assert cards[1].stars.value == 0
         group.grab().save(str(Path(__file__).with_name("preview.png")))
         box.popup()
         box.grab().save(str(Path(__file__).with_name("preview-input.png")))
@@ -68,6 +81,7 @@ def check():
         original = card.task
         QTest.mouseClick(card.edit_button, Qt.LeftButton)
         assert box.editing_task is original and box.submit.text().startswith('保存')
+        QTest.mouseClick(box.stars.buttons[3], Qt.LeftButton)
         box.edit.setText('2026-02-30 无效编辑')
         QTest.keyClick(box.edit, Qt.Key_Return)
         assert box.isVisible() and original in data['tasks']
@@ -75,6 +89,7 @@ def check():
         QTest.keyClick(box.edit, Qt.Key_Return)
         assert not box.isVisible() and len(data['tasks']) == 4
         assert group.cards_lay.itemAt(3).widget().task['title'] == '已改日期与内容'
+        assert group.cards_lay.itemAt(3).widget().task['importance'] == 4
         assert group.cards_lay.itemAt(3).widget().count.text().startswith('还有')
         edited = group.cards_lay.itemAt(3).widget().task
         box.popup(edited)

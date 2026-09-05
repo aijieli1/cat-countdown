@@ -47,6 +47,8 @@ def load_data():
         raise ValueError("任务文件格式不正确")
     for task in data["tasks"]:
         date.fromisoformat(task["date"])
+        if type(task.get('importance', 0)) is not int or not 0 <= task.get('importance', 0) <= 5:
+            raise ValueError('重要程度必须是0到5颗星')
         if not isinstance(task["title"], str) or not isinstance(task.get("c", 0), int):
             raise ValueError("任务内容格式不正确")
     pos = data.get("pos")
@@ -245,8 +247,46 @@ class CompleteButton(QPushButton):
             p.drawRoundedRect(QRectF(2, 3, 26, 28), 8, 8)
 
 
+class Stars(QWidget):
+    def __init__(self, value=0, on_change=None):
+        super().__init__()
+        self.value = value
+        self.on_change = on_change
+        row = QHBoxLayout(self)
+        row.setContentsMargins(0, 0, 0, 0)
+        row.setSpacing(1)
+        self.buttons = []
+        for number in range(1, 6):
+            button = QPushButton()
+            button.setAutoDefault(False)
+            button.setFixedSize(19, 20)
+            button.setCursor(Qt.PointingHandCursor)
+            button.setCheckable(True)
+            button.setAccessibleName(f'重要程度 {number} 星')
+            button.setToolTip(f'标为 {number} 星；再次点击当前星级可清除')
+            button.setStyleSheet('QPushButton { padding: 0; border: none; border-radius: 4px; background: transparent; color: #9A742F; font-size: 16px; } QPushButton:hover,QPushButton:focus { background: rgba(255,255,255,150); }')
+            button.clicked.connect(lambda checked=False, n=number: self.choose(n))
+            row.addWidget(button)
+            self.buttons.append(button)
+        self.setFixedSize(99, 20)
+        self.set_value(value)
+
+    def set_value(self, value):
+        self.value = value
+        for number, button in enumerate(self.buttons, 1):
+            button.setText('★' if number <= value else '☆')
+            button.setChecked(number <= value)
+
+    def choose(self, number):
+        value = 0 if self.value == number else number
+        if self.on_change is None or self.on_change(value):
+            self.set_value(value)
+        else:
+            self.set_value(self.value)
+
+
 class Card(DragSurface):
-    def __init__(self, task, on_done, on_edit):
+    def __init__(self, task, on_done, on_edit, on_rate):
         super().__init__()
         self.task = task
         self.on_done = on_done
@@ -255,18 +295,24 @@ class Card(DragSurface):
         self._fading = False
         row = QHBoxLayout(self)
         row.setContentsMargins(23, 8, 27, 17)
-        row.setSpacing(10)
+        row.setSpacing(7)
         self.dot = CompleteButton(task["title"])
         self.dot.clicked.connect(self.complete)
         row.addWidget(self.dot)
         self.count = label(size=11.5, bold=True)
-        self.count.setFixedWidth(112)
         row.addWidget(self.count)
         divider = label("│", 10)
         divider.setStyleSheet("color: rgba(75,65,83,45); background: transparent;")
         row.addWidget(divider)
         self.title = label(size=11.5, bold=True)
-        row.addWidget(self.title, 1)
+        content = QWidget()
+        details = QVBoxLayout(content)
+        details.setContentsMargins(0, 0, 0, 0)
+        details.setSpacing(0)
+        details.addWidget(self.title, 0, Qt.AlignLeft)
+        self.stars = Stars(task.get('importance', 0), lambda value: on_rate(self.task, value))
+        details.addWidget(self.stars, 0, Qt.AlignLeft)
+        row.addWidget(content, 1)
         self.edit_button = QPushButton("✎")
         self.edit_button.setFixedSize(24, 30)
         self.edit_button.setAccessibleName(f"编辑：{task['title']}")
@@ -279,10 +325,12 @@ class Card(DragSurface):
 
     def refresh(self):
         countdown = days_text(self.task["date"])
-        self.count.setText(QFontMetrics(self.count.font()).elidedText(countdown, Qt.ElideRight, 112))
+        count_width = min(118, QFontMetrics(self.count.font()).horizontalAdvance(countdown) + 2)
+        self.count.setFixedWidth(count_width)
+        self.count.setText(QFontMetrics(self.count.font()).elidedText(countdown, Qt.ElideRight, count_width))
         self.setToolTip(f"{self.task['title']}\n{countdown} · {self.task['date']}\n双击修改日期和内容")
         self.title.setText(QFontMetrics(self.title.font()).elidedText(self.task["title"], Qt.ElideRight,
-                                                                   max(30, self.width() - 274)))
+                                                                   max(30, self.width() - count_width - 150)))
 
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.LeftButton and not self._fading:
@@ -376,7 +424,7 @@ class Group(DragSurface):
             old.deleteLater()
         tasks = sorted(self.data["tasks"], key=lambda task: task["date"])
         for task in tasks:
-            self.cards_lay.addWidget(Card(task, self.remove, self.edit_requested.emit))
+            self.cards_lay.addWidget(Card(task, self.remove, self.edit_requested.emit, self.set_importance))
         if not tasks:
             empty = label("今天也要从容一点。\n点一下 +，记下下一件事", 10.5)
             empty.setFixedHeight(80)
@@ -389,9 +437,11 @@ class Group(DragSurface):
         self.scroll.setFixedHeight(height)
         self.setFixedHeight(67 + height + 48)
 
-    def add(self, iso, title):
+    def add(self, iso, title, importance=0):
         sequence = self.data.get("seq", 0) + 1
-        task = {"id": uuid.uuid4().hex, "date": iso, "title": title, "c": sequence % len(COLORS)}
+        if type(importance) is not int or not 0 <= importance <= 5:
+            raise ValueError('重要程度必须是0到5颗星')
+        task = {"id": uuid.uuid4().hex, "date": iso, "title": title, "c": sequence % len(COLORS), 'importance': importance}
         proposed = dict(self.data, seq=sequence, tasks=self.data["tasks"] + [task])
         if not save_data(proposed):
             return False
@@ -406,13 +456,26 @@ class Group(DragSurface):
             self.data.update(proposed)
         self.rebuild()
 
-    def update_task(self, task, iso, title):
-        replacement = dict(task, date=iso, title=title)
+    def update_task(self, task, iso, title, importance=None):
+        importance = task.get('importance', 0) if importance is None else importance
+        if type(importance) is not int or not 0 <= importance <= 5:
+            raise ValueError('重要程度必须是0到5颗星')
+        replacement = dict(task, date=iso, title=title, importance=importance)
         proposed = dict(self.data, tasks=[replacement if item is task else item for item in self.data['tasks']])
         if not save_data(proposed):
             return False
         self.data.update(proposed)
         self.rebuild()
+        return True
+
+    def set_importance(self, task, value):
+        if type(value) is not int or not 0 <= value <= 5:
+            raise ValueError('重要程度必须是0到5颗星')
+        replacement = dict(task, importance=value)
+        proposed = dict(self.data, tasks=[replacement if item is task else item for item in self.data['tasks']])
+        if not save_data(proposed):
+            return False
+        task['importance'] = value
         return True
 
     def check_day(self):
@@ -455,7 +518,7 @@ class InputBox(QDialog):
         self.setWindowTitle("添加倒计时")
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Tool | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setFixedSize(450, 258)
+        self.setFixedSize(450, 296)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(30, 24, 30, 30)
         layout.setSpacing(12)
@@ -479,6 +542,12 @@ class InputBox(QDialog):
         layout.addWidget(self.edit)
         self.hint = label("例如：10月16日 开会  /  2026-10-16 开会", 9)
         layout.addWidget(self.hint)
+        rating_row = QHBoxLayout()
+        rating_row.addWidget(label('重要程度', 10))
+        self.stars = Stars()
+        rating_row.addWidget(self.stars)
+        rating_row.addStretch()
+        layout.addLayout(rating_row)
         bottom = QHBoxLayout()
         for word in ("今天", "明天", "后天"):
             chip = QPushButton(word)
@@ -516,7 +585,7 @@ class InputBox(QDialog):
             self.hint.setStyleSheet("color: #A55461; background: transparent;")
             self.edit.setFocus()
             return
-        saved = self.on_update(self.editing_task, *task) if self.editing_task is not None else self.on_create(*task)
+        saved = self.on_update(self.editing_task, *task, self.stars.value) if self.editing_task is not None else self.on_create(*task, self.stars.value)
         if saved:
             self.accept()
 
@@ -530,6 +599,7 @@ class InputBox(QDialog):
         area = screen.availableGeometry()
         self.move(area.center() - self.rect().center())
         self.editing_task = task
+        self.stars.set_value(task.get('importance', 0) if task else 0)
         self.heading.setText("修改这件小事" if task else "记下一件小事")
         self.setWindowTitle("编辑倒计时" if task else "添加倒计时")
         self.submit.setText("保存  ↵" if task else "添加  ↵")

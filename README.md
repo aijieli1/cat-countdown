@@ -6,7 +6,7 @@
 
 一个简单、离线、带小猫的 Windows 桌面倒计时浮窗。安装后就能用。
 
-[![下载 Windows 安装包](https://img.shields.io/badge/下载_Windows_安装包-猫猫倒计时-927CA3?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-1.0.0-Windows-x64.exe)
+[![下载 Windows 安装包](https://img.shields.io/badge/下载_Windows_安装包-猫猫倒计时-927CA3?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-1.1.0-Windows-x64.exe)
 
 [所有版本](https://github.com/aijieli1/cat-countdown/releases) · [反馈问题](https://github.com/aijieli1/cat-countdown/issues) · [English](#english)
 
@@ -16,7 +16,7 @@
 
 ## 下载，安装，就在桌面上
 
-1. **[下载 Windows 安装包](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-1.0.0-Windows-x64.exe)**。
+1. **[下载 Windows 安装包](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-1.1.0-Windows-x64.exe)**。
 2. 双击，点 **安装**。不需要 Python、不需要注册、不需要管理员权限。
 3. 猫猫和 **三条明确标注“示例”的任务** 出现在桌面上。直接改成自己的事情就好。
 
@@ -29,6 +29,7 @@
 | 你想做什么 | 怎么操作 |
 | --- | --- |
 | 记下一件事 | 点 **＋**，或者按 **Ctrl + Alt + T** |
+| 标记重要程度 | 点卡片上的五颗星，随时改；再点当前星级可清除。编辑窗口也能设置，排序仍按日期。 |
 | 改时间、改内容 | 点卡片右侧 **✎**，或双击卡片；示例也一样可改 |
 | 完成一件事 | 点左侧圆圈，轻轻淡出 |
 | 换个位置 | 拖动猫猫或卡片，下次打开还在这里 |
@@ -115,4 +116,4 @@ ISCC.exe installer.iss
 - Drag to move; launch again to bring the existing window back to the main screen.
 - Windows 10/11 x64. The current interface is in Chinese.
 
-[Download the Windows installer](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-1.0.0-Windows-x64.exe) · [Report a bug](https://github.com/aijieli1/cat-countdown/issues)
+[Download the Windows installer](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-1.1.0-Windows-x64.exe) · [Report a bug](https://github.com/aijieli1/cat-countdown/issues)
