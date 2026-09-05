@@ -2,13 +2,13 @@
 
 # 🐾 猫猫倒计时 · Cat Countdown
 
-**把重要的日子，轻轻放在桌面上。**
+**日子有盼头，桌面有小猫。**
 
 一个简单、离线、带小猫的 Windows 桌面倒计时浮窗。安装后就能用。
 
-[![下载 Windows 安装包](https://img.shields.io/badge/下载_Windows_安装包-猫猫倒计时-927CA3?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-1.1.1-Windows-x64.exe)
+[![下载 Windows 安装包](https://img.shields.io/badge/下载_Windows_安装包-猫猫倒计时-218575?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-Windows-x64.exe)
 
-[所有版本](https://github.com/aijieli1/cat-countdown/releases) · [反馈问题](https://github.com/aijieli1/cat-countdown/issues) · [English](#english)
+[下载页面](https://github.com/aijieli1/cat-countdown/releases) · [反馈问题](https://github.com/aijieli1/cat-countdown/issues) · [English](#english)
 
 ![猫猫倒计时效果图](assets/hero.png)
 
@@ -16,7 +16,7 @@
 
 ## 下载，安装，就在桌面上
 
-1. **[下载 Windows 安装包](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-1.1.1-Windows-x64.exe)**。
+1. **[下载 Windows 安装包](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-Windows-x64.exe)**。
 2. 双击，点 **安装**。不需要 Python、不需要注册、不需要管理员权限。
 3. 猫猫和 **三条明确标注“示例”的任务** 出现在桌面上。直接改成自己的事情就好。
 
@@ -29,7 +29,7 @@
 | 你想做什么 | 怎么操作 |
 | --- | --- |
 | 记下一件事 | 点 **＋**，或者按 **Ctrl + Alt + T** |
-| 标记重要程度 | 点卡片上的五颗星，随时改；再点当前星级可清除。编辑窗口也能设置，排序仍按日期。 |
+| 标记重要程度 | 平时只显示已选星星；鼠标移到卡片上展开五颗星，点选即可更改，再点当前星级清除。编辑窗口也能设置。 |
 | 改时间、改内容 | 点卡片右侧 **✎**，或双击卡片；示例也一样可改 |
 | 完成一件事 | 点左侧圆圈，轻轻淡出 |
 | 换个位置 | 拖动猫猫或卡片，下次打开还在这里 |
@@ -61,7 +61,7 @@
 
 ## 轻一点，也实用一点
 
-- 圆角、柔色、半透明，字清楚，猫安静地趴着。
+- 薄荷绿、晴空蓝、轻盈圆角卡片，星星放在标题上方，白色小猫安静陪伴。
 - 不登录，不同步，不联网，不收集使用数据。
 - 事情按日期排列，跨天自动更新；多了可以滚动。
 - 示例只在首次使用时创建，清空后不会反复冒出来。
@@ -111,9 +111,10 @@ ISCC.exe installer.iss
 
 **Cat Countdown** is a small, offline Windows desktop countdown widget with a sleeping cat. Install it, edit the three labeled examples, and keep your dates on the desktop.
 
-- Soft translucent cards, editable dates and titles, click-to-complete.
+- Fresh mint and sky-blue cards, editable dates and titles, click-to-complete.
+- Five-star importance: only selected stars show at rest; hover over a card to edit. Tasks sort by date.
 - No account, no cloud, no telemetry. Local JSON storage.
 - Drag to move; launch again to bring the existing window back to the main screen.
 - Windows 10/11 x64. The current interface is in Chinese.
 
-[Download the Windows installer](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-1.1.1-Windows-x64.exe) · [Report a bug](https://github.com/aijieli1/cat-countdown/issues)
+[Download the Windows installer](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-Windows-x64.exe) · [Report a bug](https://github.com/aijieli1/cat-countdown/issues)

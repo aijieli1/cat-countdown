@@ -6,7 +6,8 @@ from datetime import date, timedelta
 from pathlib import Path
 from unittest.mock import patch
 
-from PySide6.QtCore import QPoint, Qt
+from PySide6.QtCore import QPoint, Qt, QEvent
+from PySide6.QtGui import QEnterEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 import main as widget
@@ -61,6 +62,22 @@ def check():
         assert widget.load_data()['tasks'] == data['tasks']
         QTest.mouseClick(cards[1].stars.buttons[1], Qt.LeftButton)
         assert cards[1].stars.value == 2
+        stars = cards[1].stars
+        for button in stars.buttons:
+            button.clearFocus()
+        app.sendEvent(cards[1], QEvent(QEvent.Leave))
+        assert [b.text() for b in stars.buttons] == ['★', '★', '', '', '']
+        app.sendEvent(cards[1], QEnterEvent(QPoint(), QPoint(), QPoint()))
+        assert [b.text() for b in stars.buttons] == ['★', '★', '☆', '☆', '☆']
+        app.sendEvent(cards[1], QEvent(QEvent.Leave))
+        app.setActiveWindow(group)
+        stars.buttons[4].setFocus(Qt.TabFocusReason)
+        QTest.qWait(10)
+        assert stars.buttons[4].text() == '☆'
+        stars.buttons[4].clearFocus()
+        QTest.qWait(10)
+        assert stars.buttons[4].text() == ''
+        assert all(b.text() == '☆' for b in box.stars.buttons)
         with patch.object(widget, 'save_data', return_value=False):
             QTest.mouseClick(cards[1].stars.buttons[3], Qt.LeftButton)
         assert cards[1].stars.value == 2 and cards[1].task['importance'] == 2

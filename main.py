@@ -13,7 +13,7 @@ from datetime import date, timedelta
 
 from PySide6.QtCore import (
     Qt, QPoint, QPointF, QRectF, QTimer, QSaveFile, QIODevice, QLockFile,
-    QPropertyAnimation, QAbstractNativeEventFilter, Signal,
+    QPropertyAnimation, QAbstractNativeEventFilter, Signal, QEvent,
 )
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPainterPath, QPen, QIcon, QPixmap, QCursor
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
@@ -28,8 +28,8 @@ DATA_FILE = os.path.join(DATA_DIR, "tasks.json")
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
 FONT = "Microsoft YaHei UI"
 WIDTH = 432
-COLORS = ["#ECDDE1", "#DDE6EE", "#E4DFED", "#DEE8E0", "#EEE4D7"]
-INK = "#28252C"
+COLORS = ["#DDFFF1", "#E2F4FF", "#F0EBFF", "#EEFFD9", "#FFF3DD"]
+INK = "#243C46"
 
 
 def load_data():
@@ -135,7 +135,7 @@ def paint_panel(painter, rect, color, radius=17):
     painter.setPen(Qt.NoPen)
     # 将阴影画在预留区域内，滚动或透明窗口均不会裁断效果。
     for spread in range(10, 0, -1):
-        painter.setBrush(QColor(40, 40, 40, 6))
+        painter.setBrush(QColor(31, 85, 94, 3))
         painter.drawRoundedRect(rect.adjusted(-spread, -spread + 5, spread, spread + 5),
                                 radius + spread, radius + spread)
     painter.setBrush(color)
@@ -171,8 +171,8 @@ class Cat(DragSurface):
     def paintEvent(self, event):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
-        outline = QColor("#B79982")
-        coat = QColor("#F2DDC6")
+        outline = QColor("#91B6B0")
+        coat = QColor("#FAFFFC")
         p.setPen(Qt.NoPen)
         p.setBrush(QColor(42, 31, 48, 28))
         p.drawEllipse(QRectF(20, 54, 120, 9))
@@ -195,16 +195,16 @@ class Cat(DragSurface):
         head.lineTo(81, 34)
         head.cubicTo(92, 60, 22, 67, 29, 33)
         p.drawPath(head)
-        p.setPen(QPen(QColor("#D6B5A5"), 3, Qt.SolidLine, Qt.RoundCap))
+        p.setPen(QPen(QColor("#F6C9CD"), 3, Qt.SolidLine, Qt.RoundCap))
         p.drawLine(QPointF(34, 20), QPointF(35, 28))
         p.drawLine(QPointF(75, 21), QPointF(74, 28))
-        p.setPen(QPen(QColor("#725D54"), 1.8, Qt.SolidLine, Qt.RoundCap))
+        p.setPen(QPen(QColor("#52706E"), 1.8, Qt.SolidLine, Qt.RoundCap))
         for x in (39, 62):
             eye = QPainterPath(QPointF(x, 38))
             eye.quadTo(x + 5, 44, x + 10, 38)
             p.drawPath(eye)
         p.setPen(Qt.NoPen)
-        p.setBrush(QColor("#EABBB5"))
+        p.setBrush(QColor("#FFCBD4"))
         p.drawEllipse(QRectF(32, 44, 10, 5))
         p.drawEllipse(QRectF(71, 44, 10, 5))
         p.drawEllipse(QRectF(53, 43, 5, 3))
@@ -213,7 +213,7 @@ class Cat(DragSurface):
         p.drawEllipse(QRectF(31, 53, 21, 10))
         p.drawEllipse(QRectF(58, 53, 21, 10))
         p.setFont(QFont(FONT, 10))
-        p.setPen(QColor("#A597AA"))
+        p.setPen(QColor("#74B7AB"))
         p.drawText(QPointF(98, 22), "z")
         p.setFont(QFont(FONT, 8))
         p.drawText(QPointF(111, 13), "z")
@@ -231,8 +231,8 @@ class CompleteButton(QPushButton):
     def paintEvent(self, event):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
-        p.setPen(QPen(QColor("#9C8F9F"), 1.5))
-        p.setBrush(QColor("#9C8F9F") if self.isChecked() else
+        p.setPen(QPen(QColor("#599B91"), 1.5))
+        p.setBrush(QColor("#599B91") if self.isChecked() else
                    QColor(255, 255, 255, 125 if self.underMouse() else 50))
         p.drawEllipse(QRectF(6, 8, 18, 18))
         if self.isChecked():
@@ -243,15 +243,17 @@ class CompleteButton(QPushButton):
             p.drawPath(path)
         if self.hasFocus():
             p.setBrush(Qt.NoBrush)
-            p.setPen(QPen(QColor("#76647F"), 1, Qt.DotLine))
+            p.setPen(QPen(QColor("#238777"), 1, Qt.DotLine))
             p.drawRoundedRect(QRectF(2, 3, 26, 28), 8, 8)
 
 
 class Stars(QWidget):
-    def __init__(self, value=0, on_change=None):
+    def __init__(self, value=0, on_change=None, compact=False):
         super().__init__()
         self.value = value
         self.on_change = on_change
+        self.compact = compact
+        self.expanded = False
         row = QHBoxLayout(self)
         row.setContentsMargins(0, 0, 0, 0)
         row.setSpacing(1)
@@ -262,9 +264,11 @@ class Stars(QWidget):
             button.setFixedSize(19, 20)
             button.setCursor(Qt.PointingHandCursor)
             button.setCheckable(True)
+            button.setFocusPolicy(Qt.TabFocus)
+            button.installEventFilter(self)
             button.setAccessibleName(f'重要程度 {number} 星')
             button.setToolTip(f'标为 {number} 星；再次点击当前星级可清除')
-            button.setStyleSheet('QPushButton { padding: 0; border: none; border-radius: 4px; background: transparent; color: #9A742F; font-size: 16px; } QPushButton:hover,QPushButton:focus { background: rgba(255,255,255,150); }')
+            button.setStyleSheet('QPushButton { padding: 0; border: none; border-radius: 4px; background: transparent; color: #997000; font-size: 16px; } QPushButton:hover,QPushButton:focus { background: rgba(255,255,255,190); }')
             button.clicked.connect(lambda checked=False, n=number: self.choose(n))
             row.addWidget(button)
             self.buttons.append(button)
@@ -273,9 +277,19 @@ class Stars(QWidget):
 
     def set_value(self, value):
         self.value = value
+        reveal = not self.compact or self.expanded or any(b.hasFocus() for b in self.buttons)
         for number, button in enumerate(self.buttons, 1):
-            button.setText('★' if number <= value else '☆')
+            button.setText('★' if number <= value else ('☆' if reveal else ''))
             button.setChecked(number <= value)
+
+    def set_expanded(self, expanded):
+        self.expanded = expanded
+        self.set_value(self.value)
+
+    def eventFilter(self, watched, event):
+        if event.type() in (QEvent.FocusIn, QEvent.FocusOut):
+            QTimer.singleShot(0, lambda: self.set_value(self.value))
+        return super().eventFilter(watched, event)
 
     def choose(self, number):
         value = 0 if self.value == number else number
@@ -309,7 +323,7 @@ class Card(DragSurface):
         details = QVBoxLayout(content)
         details.setContentsMargins(0, 0, 0, 0)
         details.setSpacing(2)
-        self.stars = Stars(task.get('importance', 0), lambda value: on_rate(self.task, value))
+        self.stars = Stars(task.get('importance', 0), lambda value: on_rate(self.task, value), compact=True)
         details.addWidget(self.stars, 0, Qt.AlignLeft)
         details.addWidget(self.title, 0, Qt.AlignLeft)
         row.addWidget(content, 1)
@@ -318,10 +332,18 @@ class Card(DragSurface):
         self.edit_button.setAccessibleName(f"编辑：{task['title']}")
         self.edit_button.setToolTip("修改日期和内容（也可双击卡片）")
         self.edit_button.setCursor(Qt.PointingHandCursor)
-        self.edit_button.setStyleSheet("QPushButton { color: #897A90; background: transparent; border: none; border-radius: 6px; font-size: 20px; } QPushButton:hover,QPushButton:focus { background: rgba(255,255,255,140); }")
+        self.edit_button.setStyleSheet("QPushButton { color: #518B89; background: transparent; border: none; border-radius: 6px; font-size: 20px; } QPushButton:hover,QPushButton:focus { background: rgba(255,255,255,140); }")
         self.edit_button.clicked.connect(lambda: self.on_edit(self.task))
         row.addWidget(self.edit_button)
         self.refresh()
+
+    def enterEvent(self, event):
+        self.stars.set_expanded(True)
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self.stars.set_expanded(False)
+        super().leaveEvent(event)
 
     def refresh(self):
         countdown = days_text(self.task["date"])
@@ -343,7 +365,7 @@ class Card(DragSurface):
 
     def paintEvent(self, event):
         color = QColor(COLORS[self.task.get("c", 0) % len(COLORS)])
-        color.setAlpha(229)
+        color.setAlpha(248)
         p = QPainter(self)
         paint_panel(p, QRectF(13, 5, self.width() - 26, 57), color)
 
@@ -383,7 +405,7 @@ class Group(DragSurface):
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll.setStyleSheet("QScrollArea { border: none; background: transparent; }"
                                   "QScrollBar:vertical { background: transparent; width: 5px; }"
-                                  "QScrollBar::handle:vertical { background: #B9ADB9; border-radius: 2px; min-height: 22px; }"
+                                  "QScrollBar::handle:vertical { background: #A6DCD1; border-radius: 2px; min-height: 22px; }"
                                   "QScrollBar::add-line:vertical,QScrollBar::sub-line:vertical { height: 0px; }"
                                   "QScrollBar::add-page:vertical,QScrollBar::sub-page:vertical { background: transparent; }")
         self.scroll.viewport().setAutoFillBackground(False)
@@ -403,10 +425,10 @@ class Group(DragSurface):
         self.plus.setToolTip("添加任务 · Ctrl + Alt + T")
         self.plus.setFixedSize(38, 38)
         self.plus.setCursor(Qt.PointingHandCursor)
-        self.plus.setStyleSheet("QPushButton { color: #706176; font: 22px 'Microsoft YaHei UI';"
-                                "background: rgba(241,235,245,230); border: 1px solid #FFFFFF; border-radius: 19px; }"
-                                "QPushButton:hover { background: #F9F5FC; }"
-                                "QPushButton:focus { border: 2px solid #9883A6; }")
+        self.plus.setStyleSheet("QPushButton { color: #207E70; font: 22px 'Microsoft YaHei UI';"
+                                "background: rgba(230,255,246,248); border: 1px solid #FFFFFF; border-radius: 19px; }"
+                                "QPushButton:hover { background: #F5FFFB; }"
+                                "QPushButton:focus { border: 2px solid #53BFA9; }")
         footer.addWidget(self.plus)
         footer.addStretch()
         layout.addLayout(footer)
@@ -429,7 +451,7 @@ class Group(DragSurface):
             empty = label("今天也要从容一点。\n点一下 +，记下下一件事", 10.5)
             empty.setFixedHeight(80)
             empty.setAlignment(Qt.AlignCenter)
-            empty.setStyleSheet("color: #554B5B; background: rgba(244,240,247,230); border: 1px solid white; border-radius: 17px; margin: 5px 13px 13px;")
+            empty.setStyleSheet("color: #416E6B; background: rgba(240,255,250,248); border: 1px solid white; border-radius: 17px; margin: 5px 13px 13px;")
             self.cards_lay.addWidget(empty)
         screen = self.screen().availableGeometry()
         height = min(max(1, len(tasks)) * 80, max(100, screen.height() - 190))
@@ -560,16 +582,16 @@ class InputBox(QDialog):
         self.submit.clicked.connect(self.commit)
         bottom.addWidget(self.submit)
         layout.addLayout(bottom)
-        self.setStyleSheet(f"QPushButton {{ color: #66576E; background: #EEE8F2; border: 1px solid transparent; border-radius: 9px; padding: 7px 10px; font: 10pt '{FONT}'; }}"
-                          "QPushButton:hover { background: #E2D9EA; } QPushButton:focus { border: 1px solid #9B85AC; }"
-                          "QPushButton#submit { background: #8D789D; color: white; padding: 8px 17px; }"
-                          "QPushButton#submit:hover { background: #78638A; }"
-                          f"QLineEdit {{ background: #FFFFFF; color: {INK}; border: 1px solid #DCD2E3; border-radius: 11px; padding: 0px 12px; font: 11pt '{FONT}'; selection-background-color: #D8CBE3; }}"
-                          "QLineEdit:focus { border: 1px solid #A08BAB; }")
+        self.setStyleSheet(f"QPushButton {{ color: #376E68; background: #E4F7F1; border: 1px solid transparent; border-radius: 9px; padding: 7px 10px; font: 10pt '{FONT}'; }}"
+                          "QPushButton:hover { background: #CFF0E5; } QPushButton:focus { border: 1px solid #4AAE98; }"
+                          "QPushButton#submit { background: #218575; color: white; padding: 8px 17px; }"
+                          "QPushButton#submit:hover { background: #176D60; }"
+                          f"QLineEdit {{ background: #FFFFFF; color: {INK}; border: 1px solid #C8E6DD; border-radius: 11px; padding: 0px 12px; font: 11pt '{FONT}'; selection-background-color: #BDEDDC; }}"
+                          "QLineEdit:focus { border: 1px solid #4AAE98; }")
 
     def paintEvent(self, event):
         p = QPainter(self)
-        paint_panel(p, QRectF(10, 5, self.width() - 20, self.height() - 21), QColor("#FAF7FB"), 21)
+        paint_panel(p, QRectF(10, 5, self.width() - 20, self.height() - 21), QColor("#F8FFFC"), 21)
 
     def choose_day(self, day):
         text = self.edit.text().strip()
@@ -605,7 +627,7 @@ class InputBox(QDialog):
         self.submit.setText("保存  ↵" if task else "添加  ↵")
         self.edit.setText(f"{task['date']} {task['title']}" if task else "")
         self.hint.setText("例如：10月16日 开会  /  2026-10-16 开会")
-        self.hint.setStyleSheet("color: #716477; background: transparent;")
+        self.hint.setStyleSheet("color: #527771; background: transparent;")
         self.show()
         self.raise_()
         self.activateWindow()
@@ -666,8 +688,8 @@ def make_icon():
     image.fill(Qt.transparent)
     p = QPainter(image)
     p.setRenderHint(QPainter.Antialiasing)
-    p.setPen(QPen(QColor("#A58D7A"), 2))
-    p.setBrush(QColor("#F2DDC6"))
+    p.setPen(QPen(QColor("#91B6B0"), 2))
+    p.setBrush(QColor("#FAFFFC"))
     path = QPainterPath(QPointF(12, 29))
     path.lineTo(12, 10)
     path.lineTo(26, 20)

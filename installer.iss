@@ -1,4 +1,4 @@
-#define AppVersion "1.1.1"
+#define AppVersion "1.0.0"
 
 [Setup]
 AppId={{24B937C3-032A-4ECD-9824-A2643C79119E}
@@ -26,7 +26,7 @@ SolidCompression=yes
 CloseApplications=yes
 RestartApplications=no
 OutputDir=installer-output
-OutputBaseFilename=CatCountdown-Setup-{#AppVersion}-Windows-x64
+OutputBaseFilename=CatCountdown-Setup-Windows-x64
 
 [Languages]
 Name: "chinesesimp"; MessagesFile: "ChineseSimplified.isl"
