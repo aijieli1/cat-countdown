@@ -132,7 +132,7 @@ def check():
             pass
         group.close()
         second.close()
-    print("PASS: 日期、输入、空状态、排序、省略、完成淡出、拖动、持久化恢复、写入失败、损坏文件保护")
+    print("PASS: widget flows, editable examples, date sorting, persistence, data protection")
 
 
 if __name__ == "__main__":
