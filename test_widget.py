@@ -53,6 +53,9 @@ def check():
         QTest.qWait(100)
         cards = [group.cards_lay.itemAt(i).widget() for i in range(group.cards_lay.count())]
         assert [c.task["date"] for c in cards] == sorted(t["date"] for t in data["tasks"])
+        assert {c.count.width() for c in cards} == {104}
+        assert len({c.layout().itemAt(2).widget().x() for c in cards}) == 1
+        assert len({c.stars.mapTo(c, QPoint()).x() for c in cards}) == 1
         assert "…" in cards[-1].title.text()
         assert cards[-1].task["title"] in cards[-1].toolTip()
         # 五星可直接改、清除，保存失败不变；日期排序不受星级影响。

@@ -347,7 +347,7 @@ class Card(DragSurface):
 
     def refresh(self):
         countdown = days_text(self.task["date"])
-        count_width = min(118, QFontMetrics(self.count.font()).horizontalAdvance(countdown) + 2)
+        count_width = 104
         self.count.setFixedWidth(count_width)
         self.count.setText(QFontMetrics(self.count.font()).elidedText(countdown, Qt.ElideRight, count_width))
         self.setToolTip(f"{self.task['title']}\n{countdown} · {self.task['date']}\n双击修改日期和内容")
