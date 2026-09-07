@@ -1,4 +1,5 @@
 from pathlib import Path
+import sys
 import PySide6
 
 a = Analysis(['main.py'], datas=[('licenses', 'licenses'), ('LICENSE', '.'),
@@ -12,3 +13,7 @@ pyz = PYZ(a.pure)
 exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name='CountdownWidget',
           console=False, icon='cat.ico', upx=False)
 coll = COLLECT(exe, a.binaries, a.datas, name='CountdownWidget', upx=False)
+if sys.platform == 'darwin':
+    app = BUNDLE(coll, name='CatCountdown.app', icon=None,
+                 bundle_identifier='com.aijieli.catcountdown',
+                 info_plist={'CFBundleShortVersionString': '1.0.0', 'LSUIElement': True})

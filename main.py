@@ -5,11 +5,16 @@ from ctypes import wintypes
 import json
 import os
 from pathlib import Path
+import plistlib
 import re
 import sys
+import tempfile
 import uuid
-import winreg
 from datetime import date, timedelta
+
+IS_WINDOWS = sys.platform == 'win32'
+if IS_WINDOWS:
+    import winreg
 
 from PySide6.QtCore import (
     Qt, QPoint, QPointF, QRectF, QTimer, QSaveFile, QIODevice, QLockFile,
@@ -23,9 +28,11 @@ from PySide6.QtWidgets import (
 )
 
 APP = "CountdownWidget"
-DATA_DIR = os.path.join(os.environ.get("LOCALAPPDATA", str(Path.home())), APP)
+DATA_DIR = (str(Path.home() / 'Library' / 'Application Support' / APP) if sys.platform == 'darwin'
+            else os.path.join(os.environ.get("LOCALAPPDATA", str(Path.home())), APP))
 DATA_FILE = os.path.join(DATA_DIR, "tasks.json")
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
+MAC_AUTOSTART = Path.home() / 'Library' / 'LaunchAgents' / 'com.aijieli.catcountdown.plist'
 FONT = "Microsoft YaHei UI"
 WIDTH = 432
 COLORS = ["#FFE4EE", "#E2F4FF", "#F0EBFF", "#FFF3DD", "#FFE8D9"]
@@ -422,7 +429,7 @@ class Group(DragSurface):
         footer.addStretch()
         self.plus = QPushButton("＋")
         self.plus.setAccessibleName("添加任务")
-        self.plus.setToolTip("添加任务 · Ctrl + Alt + T")
+        self.plus.setToolTip("添加任务 · Ctrl + Alt + T" if IS_WINDOWS else "添加任务")
         self.plus.setFixedSize(38, 38)
         self.plus.setCursor(Qt.PointingHandCursor)
         self.plus.setStyleSheet("QPushButton { color: #C55D80; font: 22px 'Microsoft YaHei UI';"
@@ -672,10 +679,10 @@ class Hotkey(QAbstractNativeEventFilter):
     def __init__(self, callback):
         super().__init__()
         self.callback = callback
-        self.registered = bool(ctypes.windll.user32.RegisterHotKey(None, 0xC071, 0x4003, 0x54))
+        self.registered = IS_WINDOWS and bool(ctypes.windll.user32.RegisterHotKey(None, 0xC071, 0x4003, 0x54))
 
     def nativeEventFilter(self, event_type, message):
-        if bytes(event_type) in (b"windows_generic_MSG", b"windows_dispatcher_MSG"):
+        if IS_WINDOWS and bytes(event_type) in (b"windows_generic_MSG", b"windows_dispatcher_MSG"):
             msg = wintypes.MSG.from_address(int(message))
             if msg.message == 0x0312 and msg.wParam == 0xC071:
                 self.callback()
@@ -695,6 +702,10 @@ def autostart_cmd():
 
 
 def autostart_on():
+    if sys.platform == 'darwin':
+        return MAC_AUTOSTART.exists()
+    if not IS_WINDOWS:
+        return False
     try:
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY) as key:
             return bool(winreg.QueryValueEx(key, APP)[0])
@@ -703,6 +714,23 @@ def autostart_on():
 
 
 def set_autostart(enabled):
+    if sys.platform == 'darwin':
+        try:
+            if not enabled:
+                MAC_AUTOSTART.unlink(missing_ok=True)
+                return True
+            MAC_AUTOSTART.parent.mkdir(parents=True, exist_ok=True)
+            arguments = [sys.executable] if getattr(sys, 'frozen', False) else [sys.executable, str(Path(__file__).resolve())]
+            payload = plistlib.dumps({'Label': 'com.aijieli.catcountdown', 'ProgramArguments': arguments, 'RunAtLoad': True})
+            with tempfile.NamedTemporaryFile(dir=MAC_AUTOSTART.parent, delete=False) as output:
+                output.write(payload)
+                temporary = Path(output.name)
+            temporary.replace(MAC_AUTOSTART)
+            return True
+        except OSError:
+            return False
+    if not IS_WINDOWS:
+        return False
     try:
         with winreg.CreateKey(winreg.HKEY_CURRENT_USER, RUN_KEY) as key:
             if enabled:
@@ -800,7 +828,7 @@ def main():
     group.plus.clicked.connect(box.popup)
     group.edit_requested.connect(box.popup)
     tray = QSystemTrayIcon(make_icon(), app)
-    tray.setToolTip("猫猫倒计时 · Ctrl + Alt + T")
+    tray.setToolTip("猫猫倒计时 · Ctrl + Alt + T" if IS_WINDOWS else "猫猫倒计时")
     menu = QMenu()
     menu.addAction("新建任务", box.popup)
     menu.addAction("显示 / 隐藏", lambda: group.hide() if group.isVisible() else group.reveal())

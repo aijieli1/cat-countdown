@@ -1,9 +1,9 @@
-name: Windows build
+name: Desktop builds
 on: [push, pull_request, workflow_dispatch]
 permissions:
   contents: read
 jobs:
-  build:
+  windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,3 +23,24 @@ jobs:
         with:
           name: CatCountdown-Windows-x64
           path: installer-output/*.exe
+  macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - name: Widget checks
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python test_widget.py
+      - run: python -m PyInstaller --noconfirm CountdownWidget.spec
+      - name: Package macOS app
+        run: |
+          mkdir -p installer-output
+          ditto -c -k --sequesterRsrc --keepParent dist/CatCountdown.app installer-output/CatCountdown-macOS-Apple-Silicon.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CatCountdown-macOS-Apple-Silicon
+          path: installer-output/*.zip

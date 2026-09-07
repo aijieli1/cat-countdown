@@ -20,15 +20,15 @@
 2. 双击，点 **安装**。不需要 Python、不需要注册、不需要管理员权限。
 3. 猫猫和 **三条明确标注“示例”的任务** 出现在桌面上。直接改成自己的事情就好。
 
-支持 **Windows 10（1809 或更新）/ Windows 11，Intel 或 AMD 64 位电脑**。macOS、Linux 暂不支持。
+支持 **Windows 10（1809 或更新）/ Windows 11，Intel 或 AMD 64 位电脑**，以及 **Apple Silicon（M 系列）macOS**。Linux 暂不支持。
 
-> 当前安装包尚未购买代码签名证书，Windows 可能显示“未知发布者”或 SmartScreen 提示。请确认文件来自本仓库的 Releases，并可用发布页的 SHA256 校验文件核对。安装程序不会要求关闭安全软件。
+> 当前安装包尚未购买代码签名证书。Windows 可能显示“未知发布者”或 SmartScreen 提示；macOS 首次打开可能需要在“系统设置 → 隐私与安全性”中确认打开。请确认文件来自本仓库的 Releases，并可用发布页的 SHA256 校验文件核对。
 
 ## 只做这几件小事
 
 | 你想做什么 | 怎么操作 |
 | --- | --- |
-| 记下一件事 | 点 **＋**，或者按 **Ctrl + Alt + T** |
+| 记下一件事 | 点 **＋**；Windows 也可按 **Ctrl + Alt + T** |
 | 标记重要程度 | 平时只显示已选星星；鼠标移到卡片上展开五颗星，点选即可更改，再点当前星级清除。编辑窗口也能设置。 |
 | 换卡片颜色 | 新建或编辑时点“卡片颜色”下的色点；粉、蓝、紫、奶黄、蜜桃可随时切换。 |
 | 改时间、改内容 | 点卡片右侧 **✎**，或双击卡片；示例也一样可改 |
@@ -110,12 +110,12 @@ ISCC.exe installer.iss
 
 ## English
 
-**Cat Countdown** is a small, offline Windows desktop countdown widget with a sleeping cat. Install it, edit the three labeled examples, and keep your dates on the desktop.
+**Cat Countdown** is a small, offline desktop countdown widget with a sleeping cat. Install it, edit the three labeled examples, and keep your dates on the desktop.
 
 - Fresh mint and sky-blue cards, editable dates and titles, click-to-complete.
 - Five-star importance: only selected stars show at rest; hover over a card to edit. Tasks sort by date.
 - No account, no cloud, no telemetry. Local JSON storage.
 - Drag to move; launch again to bring the existing window back to the main screen.
-- Windows 10/11 x64. The current interface is in Chinese.
+- Windows 10/11 x64 and Apple Silicon macOS. The current interface is in Chinese.
 
 [Download the Windows installer](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-Windows-x64.exe) · [Report a bug](https://github.com/aijieli1/cat-countdown/issues)
