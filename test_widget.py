@@ -46,8 +46,9 @@ def check():
         QTest.keyClick(box.edit, Qt.Key_Return)
         assert box.edit.text() == "2026-02-30 保留输入" and box.isVisible()
         box.edit.setText("明天 交材料")
+        QTest.mouseClick(box.color_buttons[3], Qt.LeftButton)
         QTest.keyClick(box.edit, Qt.Key_Return)
-        assert not box.isVisible() and len(data["tasks"]) == 1
+        assert not box.isVisible() and len(data["tasks"]) == 1 and data['tasks'][0]['c'] == 3
         for offset, title in [(7, "提交季度报告"), (-3, "等待确认"), (0, "组会"), (42, "这是一个需要省略展示的很长很长的任务标题")]:
             assert group.add((today + timedelta(days=offset)).isoformat(), title)
         QTest.qWait(100)
@@ -102,6 +103,7 @@ def check():
         QTest.mouseClick(card.edit_button, Qt.LeftButton)
         assert box.editing_task is original and box.submit.text().startswith('保存')
         QTest.mouseClick(box.stars.buttons[3], Qt.LeftButton)
+        QTest.mouseClick(box.color_buttons[4], Qt.LeftButton)
         box.edit.setText('2026-02-30 无效编辑')
         QTest.keyClick(box.edit, Qt.Key_Return)
         assert box.isVisible() and original in data['tasks']
@@ -110,6 +112,7 @@ def check():
         assert not box.isVisible() and len(data['tasks']) == 4
         assert group.cards_lay.itemAt(3).widget().task['title'] == '已改日期与内容'
         assert group.cards_lay.itemAt(3).widget().task['importance'] == 4
+        assert group.cards_lay.itemAt(3).widget().task['c'] == 4
         assert group.cards_lay.itemAt(3).widget().count.text().startswith('还有')
         edited = group.cards_lay.itemAt(3).widget().task
         box.popup(edited)

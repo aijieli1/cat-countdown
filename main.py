@@ -19,7 +19,7 @@ from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPainterPath, Q
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 from PySide6.QtWidgets import (
     QApplication, QWidget, QDialog, QLabel, QLineEdit, QPushButton, QVBoxLayout,
-    QHBoxLayout, QScrollArea, QGraphicsOpacityEffect, QSystemTrayIcon, QMenu, QMessageBox,
+    QHBoxLayout, QScrollArea, QGraphicsOpacityEffect, QSystemTrayIcon, QMenu, QMessageBox, QCheckBox,
 )
 
 APP = "CountdownWidget"
@@ -28,7 +28,7 @@ DATA_FILE = os.path.join(DATA_DIR, "tasks.json")
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
 FONT = "Microsoft YaHei UI"
 WIDTH = 432
-COLORS = ["#DDFFF1", "#E2F4FF", "#F0EBFF", "#EEFFD9", "#FFF3DD"]
+COLORS = ["#FFE4EE", "#E2F4FF", "#F0EBFF", "#FFF3DD", "#FFE8D9"]
 INK = "#243C46"
 
 
@@ -459,11 +459,13 @@ class Group(DragSurface):
         self.scroll.setFixedHeight(height)
         self.setFixedHeight(67 + height + 48)
 
-    def add(self, iso, title, importance=0):
+    def add(self, iso, title, importance=0, color=0):
         sequence = self.data.get("seq", 0) + 1
         if type(importance) is not int or not 0 <= importance <= 5:
             raise ValueError('重要程度必须是0到5颗星')
-        task = {"id": uuid.uuid4().hex, "date": iso, "title": title, "c": sequence % len(COLORS), 'importance': importance}
+        if type(color) is not int or not 0 <= color < len(COLORS):
+            raise ValueError('卡片颜色不正确')
+        task = {"id": uuid.uuid4().hex, "date": iso, "title": title, "c": color, 'importance': importance}
         proposed = dict(self.data, seq=sequence, tasks=self.data["tasks"] + [task])
         if not save_data(proposed):
             return False
@@ -478,11 +480,14 @@ class Group(DragSurface):
             self.data.update(proposed)
         self.rebuild()
 
-    def update_task(self, task, iso, title, importance=None):
+    def update_task(self, task, iso, title, importance=None, color=None):
         importance = task.get('importance', 0) if importance is None else importance
+        color = task.get('c', 0) if color is None else color
         if type(importance) is not int or not 0 <= importance <= 5:
             raise ValueError('重要程度必须是0到5颗星')
-        replacement = dict(task, date=iso, title=title, importance=importance)
+        if type(color) is not int or not 0 <= color < len(COLORS):
+            raise ValueError('卡片颜色不正确')
+        replacement = dict(task, date=iso, title=title, importance=importance, c=color)
         proposed = dict(self.data, tasks=[replacement if item is task else item for item in self.data['tasks']])
         if not save_data(proposed):
             return False
@@ -540,7 +545,7 @@ class InputBox(QDialog):
         self.setWindowTitle("添加倒计时")
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Tool | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setFixedSize(450, 296)
+        self.setFixedSize(450, 342)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(30, 24, 30, 30)
         layout.setSpacing(12)
@@ -570,6 +575,24 @@ class InputBox(QDialog):
         rating_row.addWidget(self.stars)
         rating_row.addStretch()
         layout.addLayout(rating_row)
+        color_row = QHBoxLayout()
+        color_row.addWidget(label('卡片颜色', 10))
+        self.color = 0
+        self.color_buttons = []
+        for index, color in enumerate(COLORS):
+            chip = QPushButton('●')
+            chip.setFixedSize(24, 24)
+            chip.setAccessibleName(f'卡片颜色 {index + 1}')
+            chip.setCursor(Qt.PointingHandCursor)
+            chip.clicked.connect(lambda checked=False, value=index: self.choose_color(value))
+            chip.setStyleSheet(f"QPushButton {{ color: {color}; background: transparent; border: none; font-size: 22px; padding: 0; }}")
+            color_row.addWidget(chip)
+            self.color_buttons.append(chip)
+        color_row.addStretch()
+        layout.addLayout(color_row)
+        self.autostart = QCheckBox('开机时自动显示倒计时')
+        self.autostart.setAccessibleName('开机自启动')
+        layout.addWidget(self.autostart)
         bottom = QHBoxLayout()
         for word in ("今天", "明天", "后天"):
             chip = QPushButton(word)
@@ -582,16 +605,22 @@ class InputBox(QDialog):
         self.submit.clicked.connect(self.commit)
         bottom.addWidget(self.submit)
         layout.addLayout(bottom)
-        self.setStyleSheet(f"QPushButton {{ color: #376E68; background: #E4F7F1; border: 1px solid transparent; border-radius: 9px; padding: 7px 10px; font: 10pt '{FONT}'; }}"
-                          "QPushButton:hover { background: #CFF0E5; } QPushButton:focus { border: 1px solid #4AAE98; }"
-                          "QPushButton#submit { background: #218575; color: white; padding: 8px 17px; }"
-                          "QPushButton#submit:hover { background: #176D60; }"
-                          f"QLineEdit {{ background: #FFFFFF; color: {INK}; border: 1px solid #C8E6DD; border-radius: 11px; padding: 0px 12px; font: 11pt '{FONT}'; selection-background-color: #BDEDDC; }}"
-                          "QLineEdit:focus { border: 1px solid #4AAE98; }")
+        self.setStyleSheet(f"QPushButton {{ color: #9B526C; background: #FFE8F0; border: 1px solid transparent; border-radius: 9px; padding: 7px 10px; font: 10pt '{FONT}'; }}"
+                          "QPushButton:hover { background: #FFD5E3; } QPushButton:focus { border: 1px solid #E889A9; }"
+                          "QPushButton#submit { background: #D96991; color: white; padding: 8px 17px; }"
+                          "QPushButton#submit:hover { background: #BE527A; }"
+                          "QCheckBox { color: #805568; font: 10pt 'Microsoft YaHei UI'; }"
+                          f"QLineEdit {{ background: #FFFFFF; color: {INK}; border: 1px solid #F2BED0; border-radius: 11px; padding: 0px 12px; font: 11pt '{FONT}'; selection-background-color: #FFD0DE; }}"
+                          "QLineEdit:focus { border: 1px solid #E889A9; }")
 
     def paintEvent(self, event):
         p = QPainter(self)
-        paint_panel(p, QRectF(10, 5, self.width() - 20, self.height() - 21), QColor("#F8FFFC"), 21)
+        paint_panel(p, QRectF(10, 5, self.width() - 20, self.height() - 21), QColor("#FFF8FB"), 21)
+
+    def choose_color(self, color):
+        self.color = color
+        for index, chip in enumerate(self.color_buttons):
+            chip.setStyleSheet(f"QPushButton {{ color: {COLORS[index]}; background: transparent; border: {'2px solid #D96991' if index == color else 'none'}; border-radius: 12px; font-size: 22px; padding: 0; }}")
 
     def choose_day(self, day):
         text = self.edit.text().strip()
@@ -607,8 +636,10 @@ class InputBox(QDialog):
             self.hint.setStyleSheet("color: #A55461; background: transparent;")
             self.edit.setFocus()
             return
-        saved = self.on_update(self.editing_task, *task, self.stars.value) if self.editing_task is not None else self.on_create(*task, self.stars.value)
+        saved = self.on_update(self.editing_task, *task, self.stars.value, self.color) if self.editing_task is not None else self.on_create(*task, self.stars.value, self.color)
         if saved:
+            if self.autostart.isChecked() != self.initial_autostart and not set_autostart(self.autostart.isChecked()):
+                QMessageBox.warning(self, '未能设置开机启动', '任务已保存，但开机启动设置没有更改。')
             self.accept()
 
     def popup(self, task=None):
@@ -621,7 +652,10 @@ class InputBox(QDialog):
         area = screen.availableGeometry()
         self.move(area.center() - self.rect().center())
         self.editing_task = task
+        self.initial_autostart = autostart_on()
+        self.autostart.setChecked(self.initial_autostart)
         self.stars.set_value(task.get('importance', 0) if task else 0)
+        self.choose_color(task.get('c', 0) if task else 0)
         self.heading.setText("修改这件小事" if task else "记下一件小事")
         self.setWindowTitle("编辑倒计时" if task else "添加倒计时")
         self.submit.setText("保存  ↵" if task else "添加  ↵")
