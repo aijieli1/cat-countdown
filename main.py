@@ -135,7 +135,7 @@ def paint_panel(painter, rect, color, radius=17):
     painter.setPen(Qt.NoPen)
     # 将阴影画在预留区域内，滚动或透明窗口均不会裁断效果。
     for spread in range(10, 0, -1):
-        painter.setBrush(QColor(31, 85, 94, 3))
+        painter.setBrush(QColor(103, 71, 83, 3))
         painter.drawRoundedRect(rect.adjusted(-spread, -spread + 5, spread, spread + 5),
                                 radius + spread, radius + spread)
     painter.setBrush(color)
@@ -171,7 +171,7 @@ class Cat(DragSurface):
     def paintEvent(self, event):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
-        outline = QColor("#91B6B0")
+        outline = QColor("#E4B4C2")
         coat = QColor("#FAFFFC")
         p.setPen(Qt.NoPen)
         p.setBrush(QColor(42, 31, 48, 28))
@@ -198,7 +198,7 @@ class Cat(DragSurface):
         p.setPen(QPen(QColor("#F6C9CD"), 3, Qt.SolidLine, Qt.RoundCap))
         p.drawLine(QPointF(34, 20), QPointF(35, 28))
         p.drawLine(QPointF(75, 21), QPointF(74, 28))
-        p.setPen(QPen(QColor("#52706E"), 1.8, Qt.SolidLine, Qt.RoundCap))
+        p.setPen(QPen(QColor("#6B5660"), 1.8, Qt.SolidLine, Qt.RoundCap))
         for x in (39, 62):
             eye = QPainterPath(QPointF(x, 38))
             eye.quadTo(x + 5, 44, x + 10, 38)
@@ -213,7 +213,7 @@ class Cat(DragSurface):
         p.drawEllipse(QRectF(31, 53, 21, 10))
         p.drawEllipse(QRectF(58, 53, 21, 10))
         p.setFont(QFont(FONT, 10))
-        p.setPen(QColor("#74B7AB"))
+        p.setPen(QColor("#D58CA5"))
         p.drawText(QPointF(98, 22), "z")
         p.setFont(QFont(FONT, 8))
         p.drawText(QPointF(111, 13), "z")
@@ -231,8 +231,8 @@ class CompleteButton(QPushButton):
     def paintEvent(self, event):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
-        p.setPen(QPen(QColor("#599B91"), 1.5))
-        p.setBrush(QColor("#599B91") if self.isChecked() else
+        p.setPen(QPen(QColor("#D77997"), 1.5))
+        p.setBrush(QColor("#D77997") if self.isChecked() else
                    QColor(255, 255, 255, 125 if self.underMouse() else 50))
         p.drawEllipse(QRectF(6, 8, 18, 18))
         if self.isChecked():
@@ -243,7 +243,7 @@ class CompleteButton(QPushButton):
             p.drawPath(path)
         if self.hasFocus():
             p.setBrush(Qt.NoBrush)
-            p.setPen(QPen(QColor("#238777"), 1, Qt.DotLine))
+            p.setPen(QPen(QColor("#D9688B"), 1, Qt.DotLine))
             p.drawRoundedRect(QRectF(2, 3, 26, 28), 8, 8)
 
 
@@ -332,7 +332,7 @@ class Card(DragSurface):
         self.edit_button.setAccessibleName(f"编辑：{task['title']}")
         self.edit_button.setToolTip("修改日期和内容（也可双击卡片）")
         self.edit_button.setCursor(Qt.PointingHandCursor)
-        self.edit_button.setStyleSheet("QPushButton { color: #518B89; background: transparent; border: none; border-radius: 6px; font-size: 20px; } QPushButton:hover,QPushButton:focus { background: rgba(255,255,255,140); }")
+        self.edit_button.setStyleSheet("QPushButton { color: #C66C89; background: transparent; border: none; border-radius: 6px; font-size: 20px; } QPushButton:hover,QPushButton:focus { background: rgba(255,255,255,140); }")
         self.edit_button.clicked.connect(lambda: self.on_edit(self.task))
         row.addWidget(self.edit_button)
         self.refresh()
@@ -405,7 +405,7 @@ class Group(DragSurface):
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll.setStyleSheet("QScrollArea { border: none; background: transparent; }"
                                   "QScrollBar:vertical { background: transparent; width: 5px; }"
-                                  "QScrollBar::handle:vertical { background: #A6DCD1; border-radius: 2px; min-height: 22px; }"
+                                  "QScrollBar::handle:vertical { background: #F0B9CA; border-radius: 2px; min-height: 22px; }"
                                   "QScrollBar::add-line:vertical,QScrollBar::sub-line:vertical { height: 0px; }"
                                   "QScrollBar::add-page:vertical,QScrollBar::sub-page:vertical { background: transparent; }")
         self.scroll.viewport().setAutoFillBackground(False)
@@ -425,10 +425,10 @@ class Group(DragSurface):
         self.plus.setToolTip("添加任务 · Ctrl + Alt + T")
         self.plus.setFixedSize(38, 38)
         self.plus.setCursor(Qt.PointingHandCursor)
-        self.plus.setStyleSheet("QPushButton { color: #207E70; font: 22px 'Microsoft YaHei UI';"
-                                "background: rgba(230,255,246,248); border: 1px solid #FFFFFF; border-radius: 19px; }"
-                                "QPushButton:hover { background: #F5FFFB; }"
-                                "QPushButton:focus { border: 2px solid #53BFA9; }")
+        self.plus.setStyleSheet("QPushButton { color: #C55D80; font: 22px 'Microsoft YaHei UI';"
+                                "background: rgba(255,238,245,248); border: 1px solid #FFFFFF; border-radius: 19px; }"
+                                "QPushButton:hover { background: #FFF8FB; }"
+                                "QPushButton:focus { border: 2px solid #E889A9; }")
         footer.addWidget(self.plus)
         footer.addStretch()
         layout.addLayout(footer)
@@ -451,7 +451,7 @@ class Group(DragSurface):
             empty = label("今天也要从容一点。\n点一下 +，记下下一件事", 10.5)
             empty.setFixedHeight(80)
             empty.setAlignment(Qt.AlignCenter)
-            empty.setStyleSheet("color: #416E6B; background: rgba(240,255,250,248); border: 1px solid white; border-radius: 17px; margin: 5px 13px 13px;")
+            empty.setStyleSheet("color: #805568; background: rgba(255,246,250,248); border: 1px solid white; border-radius: 17px; margin: 5px 13px 13px;")
             self.cards_lay.addWidget(empty)
         screen = self.screen().availableGeometry()
         height = min(max(1, len(tasks)) * 80, max(100, screen.height() - 190))
@@ -661,7 +661,7 @@ class InputBox(QDialog):
         self.submit.setText("保存  ↵" if task else "添加  ↵")
         self.edit.setText(f"{task['date']} {task['title']}" if task else "")
         self.hint.setText("例如：10月16日 开会  /  2026-10-16 开会")
-        self.hint.setStyleSheet("color: #527771; background: transparent;")
+        self.hint.setStyleSheet("color: #A56C7D; background: transparent;")
         self.show()
         self.raise_()
         self.activateWindow()
@@ -722,7 +722,7 @@ def make_icon():
     image.fill(Qt.transparent)
     p = QPainter(image)
     p.setRenderHint(QPainter.Antialiasing)
-    p.setPen(QPen(QColor("#91B6B0"), 2))
+    p.setPen(QPen(QColor("#E4B4C2"), 2))
     p.setBrush(QColor("#FAFFFC"))
     path = QPainterPath(QPointF(12, 29))
     path.lineTo(12, 10)
