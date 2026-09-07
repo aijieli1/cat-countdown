@@ -13,6 +13,6 @@
 - Ctrl + Alt + T 快速添加，双击桌面图标找回主屏，开始菜单可开启开机启动。
 - 离线保存，无账号、无广告、无遥测。卸载保留个人任务。
 
-支持 Windows 10（1809+）/ Windows 11，Intel / AMD x64。安装包未购买签名证书，系统可能提示未知发布者；请从本仓库下载，可用 SHA256SUMS.txt 核对。
+支持 Windows 10（1809+）/ Windows 11，Intel / AMD x64，以及 Apple Silicon（M 系列）macOS。Windows 下载 `.exe` 安装包；Mac 下载并解压 `CatCountdown-macOS-Apple-Silicon.zip`，将 app 拖入“应用程序”。安装包未购买签名证书，系统可能提示未知发布者；请从本仓库下载，可用 SHA256SUMS.txt 核对。
 
 如果喜欢，欢迎给仓库点一个 Star ⭐。

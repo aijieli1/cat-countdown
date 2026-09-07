@@ -8,6 +8,8 @@
 
 [![下载 Windows 安装包](https://img.shields.io/badge/下载_Windows_安装包-猫猫倒计时-218575?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-Windows-x64.exe)
 
+[![下载 macOS 安装包](https://img.shields.io/badge/下载_macOS_Apple_Silicon-猫猫倒计时-D96991?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-macOS-Apple-Silicon.zip)
+
 [下载页面](https://github.com/aijieli1/cat-countdown/releases) · [反馈问题](https://github.com/aijieli1/cat-countdown/issues) · [English](#english)
 
 ![猫猫倒计时效果图](assets/hero.png)
@@ -16,8 +18,8 @@
 
 ## 下载，安装，就在桌面上
 
-1. **[下载 Windows 安装包](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-Windows-x64.exe)**。
-2. 双击，点 **安装**。不需要 Python、不需要注册、不需要管理员权限。
+1. Windows 下载并双击 **[安装包](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-Windows-x64.exe)**；Apple Silicon Mac 下载并解压 **[CatCountdown.app](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-macOS-Apple-Silicon.zip)**。
+2. Windows 点 **安装**；Mac 将 app 拖入“应用程序”后打开。不需要 Python、注册或管理员权限。
 3. 猫猫和 **三条明确标注“示例”的任务** 出现在桌面上。直接改成自己的事情就好。
 
 支持 **Windows 10（1809 或更新）/ Windows 11，Intel 或 AMD 64 位电脑**，以及 **Apple Silicon（M 系列）macOS**。Linux 暂不支持。
@@ -118,4 +120,4 @@ ISCC.exe installer.iss
 - Drag to move; launch again to bring the existing window back to the main screen.
 - Windows 10/11 x64 and Apple Silicon macOS. The current interface is in Chinese.
 
-[Download the Windows installer](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-Windows-x64.exe) · [Report a bug](https://github.com/aijieli1/cat-countdown/issues)
+[Download for Windows](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-Windows-x64.exe) · [Download for Apple Silicon macOS](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-macOS-Apple-Silicon.zip) · [Report a bug](https://github.com/aijieli1/cat-countdown/issues)
