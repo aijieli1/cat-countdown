@@ -24,7 +24,7 @@ jobs:
           name: CatCountdown-Windows-x64
           path: installer-output/*.exe
   macos:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
