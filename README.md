@@ -24,6 +24,8 @@
 
 支持 **Windows 10（1809 或更新）/ Windows 11，Intel 或 AMD 64 位电脑**，以及 **Apple Silicon（M 系列）macOS**。Linux 暂不支持。
 
+Mac 版使用苹方字体和猫咪应用图标；切换到其他应用时组件继续显示。菜单栏猫咪图标中可以选择“显示组件”“隐藏组件”或“退出”。Windows 的 Ctrl + Alt + T 快捷键不适用于 Mac。
+
 > 当前安装包尚未购买代码签名证书。Windows 可能显示“未知发布者”或 SmartScreen 提示；macOS 首次打开可能需要在“系统设置 → 隐私与安全性”中确认打开。请确认文件来自本仓库的 Releases，并可用发布页的 SHA256 校验文件核对。
 
 ## 只做这几件小事

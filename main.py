@@ -33,7 +33,7 @@ DATA_DIR = (str(Path.home() / 'Library' / 'Application Support' / APP) if sys.pl
 DATA_FILE = os.path.join(DATA_DIR, "tasks.json")
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
 MAC_AUTOSTART = Path.home() / 'Library' / 'LaunchAgents' / 'com.aijieli.catcountdown.plist'
-FONT = "Microsoft YaHei UI"
+FONT = "PingFang SC" if sys.platform == 'darwin' else "Microsoft YaHei UI"
 WIDTH = 432
 COLORS = ["#FFE4EE", "#E2F4FF", "#F0EBFF", "#FFF3DD", "#FFE8D9"]
 INK = "#243C46"
@@ -400,6 +400,8 @@ class Group(DragSurface):
         self.today = date.today()
         self.setWindowTitle("倒计时 · 猫猫待办")
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Tool)
+        if sys.platform == 'darwin':
+            self.setAttribute(Qt.WA_MacAlwaysShowToolWindow)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setFixedWidth(WIDTH)
         layout = QVBoxLayout(self)
@@ -432,7 +434,7 @@ class Group(DragSurface):
         self.plus.setToolTip("添加任务 · Ctrl + Alt + T" if IS_WINDOWS else "添加任务")
         self.plus.setFixedSize(38, 38)
         self.plus.setCursor(Qt.PointingHandCursor)
-        self.plus.setStyleSheet("QPushButton { color: #C55D80; font: 22px 'Microsoft YaHei UI';"
+        self.plus.setStyleSheet(f"QPushButton {{ color: #C55D80; font: 22px '{FONT}';"
                                 "background: rgba(255,238,245,248); border: 1px solid #FFFFFF; border-radius: 19px; }"
                                 "QPushButton:hover { background: #FFF8FB; }"
                                 "QPushButton:focus { border: 2px solid #E889A9; }")
@@ -616,7 +618,7 @@ class InputBox(QDialog):
                           "QPushButton:hover { background: #FFD5E3; } QPushButton:focus { border: 1px solid #E889A9; }"
                           "QPushButton#submit { background: #D96991; color: white; padding: 8px 17px; }"
                           "QPushButton#submit:hover { background: #BE527A; }"
-                          "QCheckBox { color: #805568; font: 10pt 'Microsoft YaHei UI'; }"
+                          f"QCheckBox {{ color: #805568; font: 10pt '{FONT}'; }}"
                           f"QLineEdit {{ background: #FFFFFF; color: {INK}; border: 1px solid #F2BED0; border-radius: 11px; padding: 0px 12px; font: 11pt '{FONT}'; selection-background-color: #FFD0DE; }}"
                           "QLineEdit:focus { border: 1px solid #E889A9; }")
 
@@ -745,10 +747,11 @@ def set_autostart(enabled):
         return False
 
 
-def make_icon():
-    image = QPixmap(64, 64)
+def make_icon(size=64):
+    image = QPixmap(size, size)
     image.fill(Qt.transparent)
     p = QPainter(image)
+    p.scale(size / 64, size / 64)
     p.setRenderHint(QPainter.Antialiasing)
     p.setPen(QPen(QColor("#E4B4C2"), 2))
     p.setBrush(QColor("#FAFFFC"))
@@ -831,7 +834,8 @@ def main():
     tray.setToolTip("猫猫倒计时 · Ctrl + Alt + T" if IS_WINDOWS else "猫猫倒计时")
     menu = QMenu()
     menu.addAction("新建任务", box.popup)
-    menu.addAction("显示 / 隐藏", lambda: group.hide() if group.isVisible() else group.reveal())
+    menu.addAction("显示组件", group.reveal)
+    menu.addAction("隐藏组件", group.hide)
     menu.addAction("退出", app.quit)
     tray.setContextMenu(menu)
     tray.activated.connect(lambda reason: box.popup() if reason == QSystemTrayIcon.Trigger else None)
@@ -845,7 +849,7 @@ def main():
         group.reveal()
     else:
         group.raise_()
-    if not hotkey.registered:
+    if IS_WINDOWS and not hotkey.registered:
         tray.showMessage("快捷键已被占用", "仍可点击桌面 + 或托盘图标添加任务。", QSystemTrayIcon.Information, 5000)
     sys.exit(app.exec())
 

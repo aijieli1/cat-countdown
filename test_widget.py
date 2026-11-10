@@ -34,6 +34,9 @@ def check():
         assert widget.parse_task("2026-01-01 已过期")[0] == "2026-01-01"
         data = {"pos": [100, 120], "seq": 0, "tasks": []}
         group = widget.Group(data)
+        if widget.sys.platform == 'darwin':
+            assert group.testAttribute(Qt.WA_MacAlwaysShowToolWindow)
+            assert widget.FONT == 'PingFang SC'
         group.show()
         QTest.qWait(100)
         assert group.plus.isVisible() and group.pos() == QPoint(100, 120)

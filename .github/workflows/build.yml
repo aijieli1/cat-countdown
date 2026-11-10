@@ -35,7 +35,10 @@ jobs:
         env:
           QT_QPA_PLATFORM: offscreen
         run: python test_widget.py
+      - run: python build_mac_icon.py
       - run: python -m PyInstaller --noconfirm CountdownWidget.spec
+      - name: Native packaged macOS checks
+        run: python test_mac_app.py
       - name: Package macOS app
         run: |
           mkdir -p installer-output
