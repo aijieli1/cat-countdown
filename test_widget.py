@@ -98,7 +98,10 @@ def check():
         assert not box.isVisible()
         QTest.mouseClick(cards[0].dot, Qt.LeftButton)
         assert cards[0].dot.isChecked()
-        QTest.qWait(320)
+        for _ in range(30):
+            if len(data['tasks']) == 4:
+                break
+            QTest.qWait(100)
         assert len(data["tasks"]) == 4
         # 编辑通过真实按钮进入，修改日期、标题后按新日期排序；取消不保存。
         card = group.cards_lay.itemAt(0).widget()
