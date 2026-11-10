@@ -36,17 +36,19 @@ with tempfile.TemporaryDirectory() as folder:
             proc = subprocess.Popen([str(exe)], env=env, stderr=errors)
             try:
                 deadline = time.monotonic() + 30
-                while not datafile.exists() and proc.poll() is None and time.monotonic() < deadline:
+                server = main.APP + hashlib.sha256(str(datafile.parent).encode()).hexdigest()[:16]
+                probe = QLocalSocket()
+                while proc.poll() is None and time.monotonic() < deadline:
+                    probe.connectToServer(server)
+                    if probe.waitForConnected(100):
+                        break
+                    probe.abort()
                     time.sleep(.1)
+                assert probe.state() == QLocalSocket.ConnectedState, f'App IPC unavailable: {probe.errorString()}'
+                probe.disconnectFromServer()
                 assert datafile.exists() and proc.poll() is None, 'Packaged app failed to start'
                 before = datafile.read_bytes()
                 assert len(json.loads(before)['tasks']) == 3
-                server = main.APP + hashlib.sha256(str(datafile.parent).encode()).hexdigest()[:16]
-                print('Native app lock:', (datafile.parent / 'instance.lock').read_text(), flush=True)
-                probe = QLocalSocket()
-                probe.connectToServer(server)
-                assert probe.waitForConnected(5000), f'App IPC unavailable: {probe.errorString()}, TMPDIR={env.get("TMPDIR")}'
-                probe.disconnectFromServer()
                 subprocess.run([str(exe), '--reveal'], env=env, timeout=15, check=True)
                 subprocess.run([str(exe), '--quit'], env=env, timeout=15, check=True)
                 assert proc.wait(timeout=15) == 0
