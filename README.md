@@ -4,17 +4,28 @@
 
 **日子有盼头，桌面有小猫。**
 
-一个简单、离线、带小猫的 Windows 桌面倒计时浮窗。安装后就能用。
+一个简单、离线、带小猫的桌面倒计时浮窗，支持 Windows 和 Apple Silicon Mac。安装，打开，就能用。
 
-[![下载 Windows 安装包](https://img.shields.io/badge/下载_Windows_安装包-猫猫倒计时-218575?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-Windows-x64.exe)
+[![下载 Windows 安装包](https://img.shields.io/badge/下载_Windows_安装包-猫猫倒计时-D96991?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-Setup-Windows-x64.exe)
 
 [![下载 macOS 安装包](https://img.shields.io/badge/下载_macOS_Apple_Silicon-猫猫倒计时-D96991?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/aijieli1/cat-countdown/releases/latest/download/CatCountdown-macOS-Apple-Silicon.zip)
 
 [下载页面](https://github.com/aijieli1/cat-countdown/releases) · [反馈问题](https://github.com/aijieli1/cat-countdown/issues) · [English](#english)
 
+</div>
+
+## 让每一件期待，都有个小位置
+
+- 粉色、晴空蓝、浅紫、奶黄、蜜桃，五种清新卡片颜色自由选，白色小猫安静陪伴。
+- 日期、事件和五星重要程度随时修改，首次打开的三条“示例”也能直接改成自己的事情。
+- 星星放在标题上方；平时只留下已选星，鼠标移到卡片上才展开五颗星，点一下就能调整。
+- 近期事件自动排在上面，日期和标题整齐对齐；做完一件，点圆圈轻轻淡出。
+- 拖动猫猫或卡片换个位置，勾选“开机时自动显示倒计时”，让它每天陪你开工。
+- 离线使用，无需账号、没有广告或遥测。事情只保存在自己的电脑上。
+
 ![猫猫倒计时效果图](assets/hero.png)
 
-</div>
+如果喜欢，欢迎给仓库点一个 **Star ⭐**，也分享给喜欢简单桌面工具的人。
 
 ## 下载，安装，就在桌面上
 
@@ -66,7 +77,7 @@ Mac 版使用苹方字体和猫咪应用图标；切换到其他应用时组件�
 
 ## 轻一点，也实用一点
 
-- 薄荷绿、晴空蓝、轻盈圆角卡片，星星放在标题上方，白色小猫安静陪伴。
+- 浅色卡片、细白边与淡粉点缀，星星放在标题上方，白色小猫安静陪伴。
 - 不登录，不同步，不联网，不收集使用数据。
 - 事情按日期排列，跨天自动更新；多了可以滚动。
 - 示例只在首次使用时创建，清空后不会反复冒出来。
@@ -116,7 +127,7 @@ ISCC.exe installer.iss
 
 **Cat Countdown** is a small, offline desktop countdown widget with a sleeping cat. Install it, edit the three labeled examples, and keep your dates on the desktop.
 
-- Fresh mint and sky-blue cards, editable dates and titles, click-to-complete.
+- Five pastel card colors, editable dates and titles, click-to-complete.
 - Five-star importance: only selected stars show at rest; hover over a card to edit. Tasks sort by date.
 - No account, no cloud, no telemetry. Local JSON storage.
 - Drag to move; launch again to bring the existing window back to the main screen.
