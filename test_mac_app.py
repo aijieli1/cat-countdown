@@ -1,5 +1,6 @@
 """macOS packaged app check with Cocoa and an isolated user home."""
 import json
+import hashlib
 import os
 from pathlib import Path
 import plistlib
@@ -8,6 +9,8 @@ import tempfile
 import time
 from unittest.mock import patch
 import main
+from PySide6.QtCore import QCoreApplication
+from PySide6.QtNetwork import QLocalSocket
 
 assert os.uname().sysname == 'Darwin'
 bundle = Path('dist/CatCountdown.app').resolve()
@@ -15,6 +18,7 @@ with (bundle / 'Contents/Info.plist').open('rb') as stream:
     info = plistlib.load(stream)
 assert (bundle / 'Contents/Resources' / info['CFBundleIconFile']).is_file()
 exe = bundle / 'Contents/MacOS/CountdownWidget'
+qt = QCoreApplication([])
 with tempfile.TemporaryDirectory() as folder:
     # Verify the login configuration without changing this runner's login items.
     agent = Path(folder) / 'LaunchAgents/cat.plist'
@@ -37,6 +41,12 @@ with tempfile.TemporaryDirectory() as folder:
                 assert datafile.exists() and proc.poll() is None, 'Packaged app failed to start'
                 before = datafile.read_bytes()
                 assert len(json.loads(before)['tasks']) == 3
+                server = main.APP + hashlib.sha256(str(datafile.parent).encode()).hexdigest()[:16]
+                print('Native app lock:', (datafile.parent / 'instance.lock').read_text(), flush=True)
+                probe = QLocalSocket()
+                probe.connectToServer(server)
+                assert probe.waitForConnected(5000), f'App IPC unavailable: {probe.errorString()}, TMPDIR={env.get("TMPDIR")}'
+                probe.disconnectFromServer()
                 subprocess.run([str(exe), '--reveal'], env=env, timeout=15, check=True)
                 subprocess.run([str(exe), '--quit'], env=env, timeout=15, check=True)
                 assert proc.wait(timeout=15) == 0
